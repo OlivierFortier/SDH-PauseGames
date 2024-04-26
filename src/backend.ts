@@ -434,23 +434,24 @@ export function setupFocusChangeHandler(): () => void {
 
   const { unregister: unregisterAppLifetimeNotifications } =
     SteamClient.GameSessions.RegisterForAppLifetimeNotifications((app) => {
-      if (!app.bRunning) {
-        // The game has been closed, ensure it is unpaused
-        const appMD = appMetaDataMap[app.unAppID];
-        if (appMD && appMD.is_paused) {
-          // Unpause the game
-          resume(appMD.instanceid).then((success) => {
-            if (success) {
-              appMD.is_paused = false;
-              appMD.pause_state_callbacks.forEach((cb) => cb(false));
-            }
-          });
-        }
-        // Cleanup old sticky states
-        sleep(500).then(cleanupAppMetaData);
+      if (app.bRunning) {
+        return;
       }
+      // The game has been closed, ensure it is unpaused
+      const appMD = appMetaDataMap[app.unAppID];
+      if (appMD?.is_paused) {
+        // Unpause the game
+        resume(appMD.instanceid).then((success) => {
+          if (success) {
+            appMD.is_paused = false;
+            appMD.pause_state_callbacks.forEach((cb) => cb(false));
+          }
+        });
+      }
+      // Cleanup old sticky states
+      sleep(500).then(cleanupAppMetaData);
     });
-  
+
 
   return () => {
     unregisterSystemKeyEvents();

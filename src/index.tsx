@@ -65,6 +65,7 @@ const AppItem: VFC<{ app: backend.AppOverviewExt }> = ({ app }) => {
                   app.icon_data
                 : "/assets/" + app.appid + "_icon.jpg?v=" + app.icon_hash
             }
+            alt={app.display_name}
           />
         ) : null
       }
